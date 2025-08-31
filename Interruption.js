@@ -39,7 +39,7 @@
     overlay.appendChild(img);
 
     // Ambience sound
-    const audio = new Audio("https://ivorydevrimoalt.github.io/YoutubeJavascriptUltimate/creepster");
+    const audio = new Audio(atob('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2l2b3J5ZGV2cmltb2FsdC9Zb3V0dWJlSmF2YXNjcmlwdFVsdGltYXRlL3JlZnMvaGVhZHMvbWFpbi8=')+'creepster.wav');
     audio.loop = true;
 
     // After 10s: show image + play ambience
